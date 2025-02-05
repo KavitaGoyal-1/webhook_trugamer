@@ -78,22 +78,22 @@ const dbClient = new Client({
 let accessToken = null;
 
 const gamesArr = [
-  {
-    id: 6292,
-    created_at: 1398088182,
-    name: "Diablo IV: Season of Witchcraft",
-    slug: "diablo-iv-season-of-witchcraft",
-    updated_at: 1738220152,
-    url: "https://www.igdb.com/games/diablo-iv-season-of-witchcraft",
-  },
   // {
-  //   id: 217815,
-  //   created_at: 1663263833,
-  //   name: "Call of Duty: Warzone 2.0",
-  //   slug: "call-of-duty-warzone-2-dot-0",
-  //   updated_at: 1738220129,
-  //   url: "https://www.igdb.com/games/call-of-duty-warzone-2-dot-0",
+  //   id: 6292,
+  //   created_at: 1398088182,
+  //   name: "Diablo IV: Season of Witchcraft",
+  //   slug: "diablo-iv-season-of-witchcraft",
+  //   updated_at: 1738220152,
+  //   url: "https://www.igdb.com/games/diablo-iv-season-of-witchcraft",
   // },
+  {
+    id: 217815,
+    created_at: 1663263833,
+    name: "Call of Duty: Warzone 2.0",
+    slug: "call-of-duty-warzone-2-dot-0",
+    updated_at: 1738220129,
+    url: "https://www.igdb.com/games/call-of-duty-warzone-2-dot-0",
+  },
 ];
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
