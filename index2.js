@@ -1,5 +1,5 @@
 const axios = require("axios");
-const { Client } = require("pg");
+const { Pool } = require("pg");
 const { DateTime } = require("luxon");
 const express = require("express");
 const {
@@ -61,12 +61,14 @@ const categoryMapping = {
 };
 
 //production database cred
-const dbClient = new Client({
+const dbClient = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
   database: process.env.DB_DATABASE,
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
+  max: 10, 
+  idleTimeoutMillis: 30000,
 });
 
 //stage database cred
@@ -213,8 +215,8 @@ const fetchFromIGDB = async (query) => {
 };
 
 const startProcess = async (gamesArr) => {
+  const client = await dbClient.connect();
   try {
-    await dbClient.connect();
     await fetchAccessToken();
     if (accessToken) {
       if (gamesArr && gamesArr.length > 0) {
@@ -223,6 +225,8 @@ const startProcess = async (gamesArr) => {
     }
   } catch (err) {
     console.error("Error connecting to the database:", err);
+  } finally {
+    client.release(); // Always release the client back to the pool
   }
 };
 
@@ -1193,11 +1197,13 @@ app.post("/upload-files", async (req, res) => {
       return res.status(400).send("No data received");
     }
 
+    // console.log({ igdbData })
+
     await startProcess(igdbData);
     // Upload the received IGDB data to S3
     // const result = await uploadDataToS3(igdbData);
 
-    res.send({ message: "Data uploaded successfully", data: result });
+    res.send({ message: "Data uploaded successfully" });
   } catch (error) {
     res.status(500).send(error.message);
   }
