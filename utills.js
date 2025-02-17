@@ -5,10 +5,10 @@ const os = require("os");
 const FormData = require("form-data");
 require("dotenv").config();
 const { DateTime } = require("luxon");
-// const strapiUrl = process.env.PROD_STRAPI_URL;
-// const strapiToken = process.env.PROD_API_TOKEN;
-const strapiUrl = process.env.STAGE_STRAPI_URL;
-const strapiToken = process.env.STAGE_API_TOKEN;
+const strapiUrl = process.env.PROD_STRAPI_URL;
+const strapiToken = process.env.PROD_API_TOKEN;
+// const strapiUrl = process.env.STAGE_STRAPI_URL;
+// const strapiToken = process.env.STAGE_API_TOKEN;
 const openApiKey = process.env.OPEN_API_KEY;
 
 //Handle Game Genres

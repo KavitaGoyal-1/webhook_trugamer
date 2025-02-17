@@ -4,6 +4,7 @@
     "axios": "^1.7.7",
     "const": "^1.0.0",
     "csv-parser": "^3.0.0",
+    "express": "^4.21.2",
     "form-data": "^4.0.0",
     "os": "^0.1.2",
     "papaparse": "^5.4.1",

@@ -1,6 +1,7 @@
 const axios = require("axios");
 const { Client } = require("pg");
 const { DateTime } = require("luxon");
+const express = require("express");
 const {
   handleGenres,
   handleGameModes,
@@ -25,13 +26,15 @@ const {
 } = require("./utills");
 require("dotenv").config();
 
+const app = express();
+app.use(express.json());
 //prod cred:
-// const strapiUrl = process.env.PROD_STRAPI_URL;
-// const strapiToken = process.env.PROD_API_TOKEN;
+const strapiUrl = process.env.PROD_STRAPI_URL;
+const strapiToken = process.env.PROD_API_TOKEN;
 
 //stage cred:
-const strapiUrl = process.env.STAGE_STRAPI_URL;
-const strapiToken = process.env.STAGE_API_TOKEN;
+// const strapiUrl = process.env.STAGE_STRAPI_URL;
+// const strapiToken = process.env.STAGE_API_TOKEN;
 
 const TWITCH_AUTH_URL = "https://id.twitch.tv/oauth2/token";
 const IGDB_API_URL = "https://api.igdb.com/v4/games";
@@ -58,15 +61,6 @@ const categoryMapping = {
 };
 
 //production database cred
-// const dbClient = new Client({
-//   user: "postgres",
-//   host: "trugamer-prod-db5.cdeu2squiugy.eu-north-1.rds.amazonaws.com",
-//   database: "trugamerdb",
-//   password: "_MN%CMeRXHMiq5a",
-//   port: 5432,
-// });
-
-//stage database cred
 const dbClient = new Client({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
@@ -74,6 +68,15 @@ const dbClient = new Client({
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
 });
+
+//stage database cred
+// const dbClient = new Client({
+// user: process.env.DB_USER,
+// host: process.env.DB_HOST,
+// database: process.env.DB_DATABASE,
+// password: process.env.DB_PASSWORD,
+// port: process.env.DB_PORT,
+// });
 
 let accessToken = null;
 
@@ -209,7 +212,7 @@ const fetchFromIGDB = async (query) => {
   return data; // Return the result of the IGDB API call
 };
 
-const startProcess = async () => {
+const startProcess = async (gamesArr) => {
   try {
     await dbClient.connect();
     await fetchAccessToken();
@@ -961,97 +964,97 @@ const getParentGameById = async (parentGameId, headerFromApi) => {
 };
 const objectForGame = async (parsedData, headerFromApi) => {
   try {
-    // const categoryId = parsedData.category;
-    // const categoryName = categoryMapping[categoryId];
-    // const gameGenres = await handleGenres(parsedData);
-    // const gameModes = await handleGameModes(parsedData);
-    // const gamePlayerPerspectives = await handlePlayerPerspectives(parsedData);
-    // const gameThemes = await handleThemes(parsedData);
-    // const gameKeywords = await handleKeywords(parsedData);
-    // const gameAlternativeNames = await handleAlternativeNames(parsedData);
-    // const gameEngines = await handleGameEngines(parsedData);
-    // const gameLanguageSupports = await handleLanguageSupports(parsedData);
-    // const gameInvolvedCompanies = await handleInvolvedCompanies(parsedData);
-    // const gameFranchies = await handleFrenchies(parsedData);
-    // const externalGames = await handleExternalGames(parsedData);
-    // const gameCoverImage = await handleCoverImage(parsedData);
-    // const gameBackgroundImage = await handleBackgroundImage(parsedData);
-    // const gameScreenShots = await handleScreenShots(parsedData);
-    // const gameCollections = await handleCollections(parsedData);
-    // const gamePlatforms = await handlePlatforms(parsedData);
-    // const gameVideos = await handleVideos(parsedData);
-    // const gameWebsiteLinks = await handleWebsiteLinks(parsedData);
-    // const promtGeneratedDescription = await getRewrittenDescription(
-    //   parsedData?.name,
-    //   parsedData?.summary
-    // );
-    // const gameReleaseDates = await handleReleaseDates(
-    //   parsedData,
-    //   headerFromApi
-    // );
-    // const gameSeriesOrSpinOff = await handleSeriesAndSpinOff(
-    //   parsedData,
-    //   headerFromApi
-    // );
-    // const similarGames = await handleSimilarGames(parsedData, headerFromApi);
-    // const expansionGames = await handleGameExpansions(
-    //   parsedData,
-    //   headerFromApi
-    // );
+    const categoryId = parsedData.category;
+    const categoryName = categoryMapping[categoryId];
+    const gameGenres = await handleGenres(parsedData);
+    const gameModes = await handleGameModes(parsedData);
+    const gamePlayerPerspectives = await handlePlayerPerspectives(parsedData);
+    const gameThemes = await handleThemes(parsedData);
+    const gameKeywords = await handleKeywords(parsedData);
+    const gameAlternativeNames = await handleAlternativeNames(parsedData);
+    const gameEngines = await handleGameEngines(parsedData);
+    const gameLanguageSupports = await handleLanguageSupports(parsedData);
+    const gameInvolvedCompanies = await handleInvolvedCompanies(parsedData);
+    const gameFranchies = await handleFrenchies(parsedData);
+    const externalGames = await handleExternalGames(parsedData);
+    const gameCoverImage = await handleCoverImage(parsedData);
+    const gameBackgroundImage = await handleBackgroundImage(parsedData);
+    const gameScreenShots = await handleScreenShots(parsedData);
+    const gameCollections = await handleCollections(parsedData);
+    const gamePlatforms = await handlePlatforms(parsedData);
+    const gameVideos = await handleVideos(parsedData);
+    const gameWebsiteLinks = await handleWebsiteLinks(parsedData);
+    const promtGeneratedDescription = await getRewrittenDescription(
+      parsedData?.name,
+      parsedData?.summary
+    );
+    const gameReleaseDates = await handleReleaseDates(
+      parsedData,
+      headerFromApi
+    );
+    const gameSeriesOrSpinOff = await handleSeriesAndSpinOff(
+      parsedData,
+      headerFromApi
+    );
+    const similarGames = await handleSimilarGames(parsedData, headerFromApi);
+    const expansionGames = await handleGameExpansions(
+      parsedData,
+      headerFromApi
+    );
     const sessionGames = await getOrCreateSeason(parsedData, headerFromApi);
     const gameData = {
       title: parsedData.name || null,
       slug: parsedData.slug || null,
       site_url: parsedData.url,
-      // genres: gameGenres || [],
-      // game_modes: gameModes || [],
-      // player_perspective: gamePlayerPerspectives || [],
-      // themes: gameThemes || [],
-      // keywords: gameKeywords || [],
-      // alternative_names: gameAlternativeNames || [],
-      // game_engines: gameEngines || [],
-      // language_supports: gameLanguageSupports || [],
-      // involved_companies:
-      //   (gameInvolvedCompanies &&
-      //     gameInvolvedCompanies?.involvedCompaniesArray) ||
-      //   [],
-      // publisher:
-      //   (gameInvolvedCompanies && gameInvolvedCompanies?.publishersArray) || [],
-      // developer:
-      //   gameInvolvedCompanies &&
-      //   gameInvolvedCompanies?.developersArray &&
-      //   gameInvolvedCompanies?.developersArray.length > 0
-      //     ? gameInvolvedCompanies?.developersArray
-      //     : [],
-      // franchises: gameFranchies || [],
-      // external_games: externalGames || [],
-      // coverImage: gameCoverImage || null,
-      // image: gameBackgroundImage || null,
-      // ...(gameScreenShots &&
-      //   gameScreenShots.length > 0 && {
-      //     screenshots: gameScreenShots,
-      //   }),
-      // collections: gameCollections || [],
-      // platforms: gamePlatforms || [],
-      // videos: gameVideos || [],
-      // website_links: gameWebsiteLinks || [],
-      // description: promtGeneratedDescription || null,
-      // releaseByPlatforms: {
-      //   release:
-      //     gameReleaseDates?.releaseByPlatformsArray &&
-      //     gameReleaseDates?.releaseByPlatformsArray.length > 0
-      //       ? gameReleaseDates?.releaseByPlatformsArray
-      //       : [],
-      // },
-      // devices: gameReleaseDates?.devicesArray || [],
-      // firstReleaseDate: gameReleaseDates?.earliestReleaseDate || null,
-      // latestReleaseDate: gameReleaseDates?.latestReleaseDate || null,
-      // // game_category: categoryName || null,
-      // aggregateRating: parsedData.aggregated_rating || null,
-      // series: gameSeriesOrSpinOff?.seriesName || null,
-      // isSpinOff: gameSeriesOrSpinOff?.isSpinOffName || null,
-      // related_games: similarGames || [],
-      // expansions: expansionGames || [],
+      genres: gameGenres || [],
+      game_modes: gameModes || [],
+      player_perspective: gamePlayerPerspectives || [],
+      themes: gameThemes || [],
+      keywords: gameKeywords || [],
+      alternative_names: gameAlternativeNames || [],
+      game_engines: gameEngines || [],
+      language_supports: gameLanguageSupports || [],
+      involved_companies:
+        (gameInvolvedCompanies &&
+          gameInvolvedCompanies?.involvedCompaniesArray) ||
+        [],
+      publisher:
+        (gameInvolvedCompanies && gameInvolvedCompanies?.publishersArray) || [],
+      developer:
+        gameInvolvedCompanies &&
+        gameInvolvedCompanies?.developersArray &&
+        gameInvolvedCompanies?.developersArray.length > 0
+          ? gameInvolvedCompanies?.developersArray
+          : [],
+      franchises: gameFranchies || [],
+      external_games: externalGames || [],
+      coverImage: gameCoverImage || null,
+      image: gameBackgroundImage || null,
+      ...(gameScreenShots &&
+        gameScreenShots.length > 0 && {
+          screenshots: gameScreenShots,
+        }),
+      collections: gameCollections || [],
+      platforms: gamePlatforms || [],
+      videos: gameVideos || [],
+      website_links: gameWebsiteLinks || [],
+      description: promtGeneratedDescription || null,
+      releaseByPlatforms: {
+        release:
+          gameReleaseDates?.releaseByPlatformsArray &&
+          gameReleaseDates?.releaseByPlatformsArray.length > 0
+            ? gameReleaseDates?.releaseByPlatformsArray
+            : [],
+      },
+      devices: gameReleaseDates?.devicesArray || [],
+      firstReleaseDate: gameReleaseDates?.earliestReleaseDate || null,
+      latestReleaseDate: gameReleaseDates?.latestReleaseDate || null,
+      // game_category: categoryName || null,
+      aggregateRating: parsedData.aggregated_rating || null,
+      series: gameSeriesOrSpinOff?.seriesName || null,
+      isSpinOff: gameSeriesOrSpinOff?.isSpinOffName || null,
+      related_games: similarGames || [],
+      expansions: expansionGames || [],
       seasons: sessionGames || [],
     };
     return gameData;
@@ -1117,42 +1120,42 @@ const updateOrCreateGameDataWithNewFeilds = async (dataObj, gameId) => {
         title: dataObj.title || null,
         slug: dataObj.slug || null,
         site_url: dataObj.site_url || null,
-        // genres: dataObj.genres || [],
-        // game_modes: dataObj.game_modes || [],
-        // player_perspective: dataObj.player_perspective || [],
-        // themes: dataObj.themes || [],
-        // keywords: dataObj.keywords || [],
-        // alternative_names: dataObj.alternative_names || [],
-        // game_engines: dataObj.game_engines || [],
-        // language_supports: dataObj.language_supports || [],
-        // involved_companies: dataObj.involved_companies || [],
-        // publisher: dataObj.publisher || [],
-        // developer: dataObj.developer || [],
-        // franchises: dataObj.franchises || [],
-        // external_games: dataObj.external_games || [],
-        // coverImage: dataObj.coverImage || null,
-        // image: dataObj.image || null,
-        // ...(dataObj.screenshots &&
-        //   dataObj.screenshots.length > 0 && {
-        //     screenshots: dataObj.screenshots,
-        //   }),
-        // collections: dataObj.collections || [],
-        // platforms: dataObj.platforms || [],
-        // videos: dataObj.videos || [],
-        // website_links: dataObj.website_links || [],
-        // description: dataObj.description || null,
-        // releaseByPlatforms: dataObj.releaseByPlatforms,
-        // devices: dataObj.devices || [],
-        // firstReleaseDate: dataObj?.firstReleaseDate || null,
-        // latestReleaseDate: dataObj?.latestReleaseDate || null,
-        // // game_category: dataObj.game_category || "",
-        // aggregateRating: dataObj.aggregateRating,
-        // series: dataObj.series || null,
-        // isSpinOff: dataObj.isSpinOff || null,
-        // publishedAt: addPublishedAtIfRequired(dataObj),
-        // isUpdatedFromScript: true,
-        // related_games: dataObj.related_games || [],
-        // expansions: dataObj.expansions || [],
+        genres: dataObj.genres || [],
+        game_modes: dataObj.game_modes || [],
+        player_perspective: dataObj.player_perspective || [],
+        themes: dataObj.themes || [],
+        keywords: dataObj.keywords || [],
+        alternative_names: dataObj.alternative_names || [],
+        game_engines: dataObj.game_engines || [],
+        language_supports: dataObj.language_supports || [],
+        involved_companies: dataObj.involved_companies || [],
+        publisher: dataObj.publisher || [],
+        developer: dataObj.developer || [],
+        franchises: dataObj.franchises || [],
+        external_games: dataObj.external_games || [],
+        coverImage: dataObj.coverImage || null,
+        image: dataObj.image || null,
+        ...(dataObj.screenshots &&
+          dataObj.screenshots.length > 0 && {
+            screenshots: dataObj.screenshots,
+          }),
+        collections: dataObj.collections || [],
+        platforms: dataObj.platforms || [],
+        videos: dataObj.videos || [],
+        website_links: dataObj.website_links || [],
+        description: dataObj.description || null,
+        releaseByPlatforms: dataObj.releaseByPlatforms,
+        devices: dataObj.devices || [],
+        firstReleaseDate: dataObj?.firstReleaseDate || null,
+        latestReleaseDate: dataObj?.latestReleaseDate || null,
+        // game_category: dataObj.game_category || "",
+        aggregateRating: dataObj.aggregateRating,
+        series: dataObj.series || null,
+        isSpinOff: dataObj.isSpinOff || null,
+        publishedAt: addPublishedAtIfRequired(dataObj),
+        isUpdatedFromScript: true,
+        related_games: dataObj.related_games || [],
+        expansions: dataObj.expansions || [],
         seasons: dataObj.seasons || [],
       },
     };
@@ -1182,4 +1185,24 @@ const updateOrCreateGameDataWithNewFeilds = async (dataObj, gameId) => {
   }
 };
 
-startProcess();
+app.post("/upload-files", async (req, res) => {
+  try {
+    const igdbData = req.body;
+
+    if (!igdbData) {
+      return res.status(400).send("No data received");
+    }
+
+    await startProcess(igdbData);
+    // Upload the received IGDB data to S3
+    // const result = await uploadDataToS3(igdbData);
+
+    res.send({ message: "Data uploaded successfully", data: result });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+app.listen(3002, () => {
+  console.log(`Example app listening on port ${3002}`);
+});
